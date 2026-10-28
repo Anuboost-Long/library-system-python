@@ -18,6 +18,7 @@ def show_start_menu() -> int:
             ("3", "Show All Members"),
             ("4", "Add Item"),
             ("5", "Show All Items"),
+            ("6", "Loan List"),
         ]
 
         def render_menu(container: Container) -> None:
@@ -38,7 +39,7 @@ def show_start_menu() -> int:
 
         choice = input(f"\n  {GREEN}❯{RESET} Select an option: ").strip()
 
-        if choice in ("0", "1", "2", "3", "4", "5"):
+        if choice in ("0", "1", "2", "3", "4", "5", "6"):
             return int(choice)
 
         print(f"\n  {RED}✕ Invalid option. Please try again.{RESET}")

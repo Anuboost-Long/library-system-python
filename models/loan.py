@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 
 class Loan:
@@ -7,9 +7,9 @@ class Loan:
         loan_id: str,
         member_id: str,
         item_id: str,
-        borrow_date: date,
-        due_date: date,
-        return_date: date | None = None,
+        borrow_date: datetime,
+        due_date: datetime,
+        return_date: datetime | None = None,
     ):
         self.loan_id = self.validate_id("Loan ID", loan_id)
         self.member_id = self.validate_id("Member ID", member_id)
@@ -32,14 +32,14 @@ class Loan:
         return value.strip()
 
     @staticmethod
-    def validate_date(label: str, value: date) -> date:
-        if not isinstance(value, date):
-            raise ValueError(f"{label} must be a date")
+    def validate_date(label: str, value: datetime) -> datetime:
+        if not isinstance(value, datetime):
+            raise ValueError(f"{label} must be a timestamp")
 
         return value
 
     @classmethod
-    def validate_optional_date(cls, value: date | None) -> date | None:
+    def validate_optional_date(cls, value: datetime | None) -> datetime | None:
         if value is None:
             return None
 
