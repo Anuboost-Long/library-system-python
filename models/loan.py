@@ -11,9 +11,9 @@ class Loan:
         due_date: datetime,
         return_date: datetime | None = None,
     ):
-        self.loan_id = self.validate_id("Loan ID", loan_id)
-        self.member_id = self.validate_id("Member ID", member_id)
-        self.item_id = self.validate_id("Item ID", item_id)
+        self.loan_id = loan_id
+        self.member_id = member_id
+        self.item_id = item_id
         self.borrow_date = self.validate_date("Borrow date", borrow_date)
         self.due_date = self.validate_date("Due date", due_date)
         self.return_date = self.validate_optional_date(return_date)
@@ -23,6 +23,39 @@ class Loan:
 
         if self.return_date is not None and self.return_date < self.borrow_date:
             raise ValueError("Return date cannot be before the borrow date")
+
+    @property
+    def loan_id(self) -> str:
+        return self.__loan_id
+
+    @loan_id.setter
+    def loan_id(self, value: str) -> None:
+        if hasattr(self, "_Loan__loan_id"):
+            raise AttributeError("Loan ID cannot be changed")
+
+        self.__loan_id = self.validate_id("Loan ID", value)
+
+    @property
+    def member_id(self) -> str:
+        return self.__member_id
+
+    @member_id.setter
+    def member_id(self, value: str) -> None:
+        if hasattr(self, "_Loan__member_id"):
+            raise AttributeError("Member ID cannot be changed")
+
+        self.__member_id = self.validate_id("Member ID", value)
+
+    @property
+    def item_id(self) -> str:
+        return self.__item_id
+
+    @item_id.setter
+    def item_id(self, value: str) -> None:
+        if hasattr(self, "_Loan__item_id"):
+            raise AttributeError("Item ID cannot be changed")
+
+        self.__item_id = self.validate_id("Item ID", value)
 
     @staticmethod
     def validate_id(label: str, value: str) -> str:

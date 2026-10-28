@@ -44,7 +44,11 @@ class LoanService:
         if len(library_items) > self.available_item_slots(library_member):
             raise ValueError("Member has reached their borrowing limit")
 
-        if any(not item.is_available for item in library_items):
+        if any(
+            not item.is_available
+            or self.get_active_loans(item_id=item.item_id)
+            for item in library_items
+        ):
             raise ValueError("Item is not available")
 
         if borrowed_at is not None and not isinstance(borrowed_at, datetime):
@@ -132,7 +136,7 @@ class LoanService:
 
     def resolve_loan(self, loan: Loan | str) -> Loan:
         if isinstance(loan, Loan):
-            return loan
+            loan = loan.loan_id
 
         if isinstance(loan, str):
             library_loan = self.get_loan(loan)
