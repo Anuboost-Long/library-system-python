@@ -53,3 +53,6 @@ class Person:
         if "@" not in value.strip():
             raise ValueError("Invalid email")
         self.__email = value.strip()
+
+    def describe(self) -> str:
+        return f"Name: {self.name}, Email: {self.email}"

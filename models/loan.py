@@ -44,3 +44,6 @@ class Loan:
             return None
 
         return cls.validate_date("Return date", value)
+
+    def is_overdue(self, now: datetime | None = None) -> bool:
+        return self.return_date is None and self.due_date < (now or datetime.now())

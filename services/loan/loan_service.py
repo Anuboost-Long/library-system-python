@@ -86,12 +86,7 @@ class LoanService:
         ]
 
     def get_overdue_loans(self) -> list[Loan]:
-        now = datetime.now()
-        return [
-            loan
-            for loan in self.get_active_loans()
-            if loan.due_date < now
-        ]
+        return [loan for loan in self.get_active_loans() if loan.is_overdue()]
 
     def get_loans_for_member(self, member: LibraryMember | str) -> list[Loan]:
         library_member = self.resolve_member(member)
@@ -148,7 +143,7 @@ class LoanService:
 
     def resolve_member(self, member: LibraryMember | str) -> LibraryMember:
         if isinstance(member, LibraryMember):
-            return member
+            member = member.member_id
 
         if isinstance(member, str):
             registered_member = self.__member_service.get_member(member)
@@ -159,7 +154,7 @@ class LoanService:
 
     def resolve_item(self, item: LibraryItem | str) -> LibraryItem:
         if isinstance(item, LibraryItem):
-            return item
+            item = item.item_id
 
         if isinstance(item, str):
             library_item = self.__library_service.get_item(item)

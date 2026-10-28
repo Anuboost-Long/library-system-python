@@ -31,8 +31,12 @@ class LibraryMember(Person):
 
     @member_id.setter
     def member_id(self, value):
-        if not value.strip().startswith("Tor"):
+        if hasattr(self, "_LibraryMember__member_id"):
+            raise AttributeError("Member ID cannot be changed")
+
+        if not isinstance(value, str) or not value.strip().startswith("Tor"):
             raise ValueError("Invalid Member Id")
+
         self.__member_id = value.strip()
 
     @property

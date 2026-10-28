@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from constants.theme import CYAN, DEFAULT_WIDTH, GREEN, RED, RESET
 from models.library_member import LibraryMember
 from models.loan import Loan
@@ -332,7 +330,7 @@ def loan_details(loan: Loan) -> list[str]:
 
 
 def styled_loan_line(line: str, loan: Loan) -> str:
-    if line.startswith("Due:") and loan.return_date is None and loan.due_date < datetime.now():
+    if line.startswith("Due:") and loan.is_overdue():
         return f"{RED}{line}{RESET}"
 
     if not line.startswith("Returned:"):
