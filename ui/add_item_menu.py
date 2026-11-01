@@ -1,8 +1,7 @@
-from constants.theme import CYAN, GREEN, RESET
+from constants.theme import GREEN, RESET
 from models.library_item import LibraryItem
 from services.library.library_service import LibraryService
-from ui.components import Container
-from ui.prompts import ask, show_error, show_success
+from ui.prompts import ask, show_error, show_header, show_success
 
 
 def collect_item() -> LibraryItem:
@@ -24,19 +23,12 @@ def collect_item() -> LibraryItem:
 
 
 def show_add_item_menu(library_service: LibraryService) -> None:
-    def render_intro(container: Container) -> None:
-        container.line()
-        container.line("Add an item")
-        container.line("Enter the item details below.")
-        container.line()
-        container.divider()
-        container.line("[Enter]  Add item", f"{CYAN}[Enter]{RESET}  Add item")
-        container.line("[B]      Back", f"{CYAN}[B]{RESET}      Back")
-
     while True:
-        Container().show(render_intro)
+        show_header("Add an item", "Enter the item details below.")
+        print("[Enter] Add item")
+        print("[B] Back")
 
-        choice = input(f"\n  {GREEN}❯{RESET} Select an option: ").strip().lower()
+        choice = input(f"\n{GREEN}>{RESET} Select an option: ").strip().lower()
 
         if choice == "b":
             return

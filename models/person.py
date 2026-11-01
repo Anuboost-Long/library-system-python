@@ -55,4 +55,9 @@ class Person:
         self.__email = value.strip()
 
     def describe(self) -> str:
-        return f"Name: {self.name}, Email: {self.email}"
+        return (
+            f"Name: {self.name}\n"
+            f"Date of birth: {self.dob:%d/%m/%Y}\n"
+            f"Email: {self.email}\n"
+            f"Phone: {self.phone}"
+        )

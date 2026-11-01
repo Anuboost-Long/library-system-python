@@ -47,3 +47,15 @@ class LibraryItem:
             raise ValueError("Availability must be a boolean")
 
         return value
+
+    def describe(self) -> str:
+        status = "Available" if self.is_available else "Borrowed"
+        author = self.author or "Not specified"
+
+        return (
+            f"Item ID: {self.item_id}\n"
+            f"Name: {self.name}\n"
+            f"Type: {self.item_type}\n"
+            f"Author: {author}\n"
+            f"Status: {status}"
+        )

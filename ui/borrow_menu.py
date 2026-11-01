@@ -1,11 +1,9 @@
-from constants.theme import DEFAULT_WIDTH, GREEN, RED, RESET
-from models.library_item import LibraryItem
+from constants.theme import GREEN, RESET
 from models.library_member import LibraryMember
 from services.library.library_service import LibraryService
 from services.loan.loan_service import LoanService
 from services.member.member_service import MemberService
-from ui.components import Container
-from ui.prompts import show_error, show_success
+from ui.prompts import show_error, show_header, show_success
 
 
 RECORDS_PER_PAGE = 10
@@ -56,25 +54,19 @@ def select_member(member_service: MemberService) -> LibraryMember | None:
             controls.append("[N]  Next")
 
         controls.append("[B]  Back")
-        content = [f"Select member · Page {page} of {page_count}", *controls]
-        content.extend(member_line(member) for member in members)
-        width = max(DEFAULT_WIDTH, max(len(line) + 4 for line in content))
+        show_header(f"Select member · Page {page} of {page_count}")
 
-        def render_members(container: Container) -> None:
-            container.line()
-            container.line(f"Select member · Page {page} of {page_count}")
-            container.line()
+        for index, member in enumerate(members):
+            if index:
+                print("-" * 44)
 
-            for member in members:
-                container.line(member_line(member))
+            print(member.describe())
 
-            container.line()
-            for control in controls:
-                container.line(control)
-
-        Container(width=width).show(render_members)
+        print("-" * 44)
+        for control in controls:
+            print(control)
         choice = input(
-            f"\n  {GREEN}❯{RESET} Enter a member ID or select an option: "
+            f"\n{GREEN}>{RESET} Enter a member ID or select an option: "
         ).strip()
         member = member_service.get_member(choice)
 
@@ -136,29 +128,22 @@ def select_items(
             f"{len(selected_item_ids)} of {slots} selected · "
             f"Page {page} of {page_count}"
         )
-        content = [heading, *controls, *selected_item_ids]
-        content.extend(item_line(item) for item in page_items)
-        width = max(DEFAULT_WIDTH, max(len(line) + 4 for line in content))
+        show_header(heading)
 
-        def render_items(container: Container) -> None:
-            container.line()
-            container.line(heading)
-            container.line()
+        for index, item in enumerate(page_items):
+            if index:
+                print("-" * 44)
 
-            for item in page_items:
-                container.line(item_line(item), styled_item_line(item))
+            print(item.describe())
 
-            if selected_item_ids:
-                container.line()
-                container.line(f"Selected: {', '.join(selected_item_ids)}")
+        if selected_item_ids:
+            print(f"\nSelected: {', '.join(selected_item_ids)}")
 
-            container.line()
-            for control in controls:
-                container.line(control)
-
-        Container(width=width).show(render_items)
+        print("-" * 44)
+        for control in controls:
+            print(control)
         choice = input(
-            f"\n  {GREEN}❯{RESET} Enter an item ID or select an option: "
+            f"\n{GREEN}>{RESET} Enter an item ID or select an option: "
         ).strip()
 
         if choice.lower() == "b":
@@ -190,26 +175,3 @@ def select_items(
             continue
 
         selected_item_ids.append(item.item_id)
-
-
-def member_line(member: LibraryMember) -> str:
-    return f"{member.member_id} · {member.name} · {member.membership_type}"
-
-
-def item_line(item: LibraryItem) -> str:
-    return (
-        f"{item.item_id} · {item.name} · {item.item_type} · "
-        f"{availability_label(item)}"
-    )
-
-
-def styled_item_line(item: LibraryItem) -> str:
-    colour = GREEN if item.is_available else RED
-    return (
-        f"{item.item_id} · {item.name} · {item.item_type} · "
-        f"{colour}{availability_label(item)}{RESET}"
-    )
-
-
-def availability_label(item: LibraryItem) -> str:
-    return "● Available" if item.is_available else "● Unavailable"

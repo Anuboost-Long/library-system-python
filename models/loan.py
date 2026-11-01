@@ -80,3 +80,18 @@ class Loan:
 
     def is_overdue(self, now: datetime | None = None) -> bool:
         return self.return_date is None and self.due_date < (now or datetime.now())
+
+    def describe(self) -> str:
+        returned = "Not returned"
+
+        if self.return_date is not None:
+            returned = self.return_date.strftime("Returned %d/%m/%Y %H:%M")
+
+        return (
+            f"Loan ID: {self.loan_id}\n"
+            f"Member ID: {self.member_id}\n"
+            f"Item ID: {self.item_id}\n"
+            f"Borrowed: {self.borrow_date:%d/%m/%Y %H:%M}\n"
+            f"Due: {self.due_date:%d/%m/%Y %H:%M}\n"
+            f"Returned: {returned}"
+        )

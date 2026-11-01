@@ -1,11 +1,10 @@
 from datetime import date
 
-from constants.theme import CYAN, GREEN, RESET
+from constants.theme import GREEN, RESET
 from models.library_member import LibraryMember
 from models.membership_type import MembershipType
 from services.member.member_service import MemberService
-from ui.components import Container
-from ui.prompts import ask, show_error, show_success
+from ui.prompts import ask, show_error, show_header, show_success
 from utils.check_date_valid import check_date_validity
 
 
@@ -59,21 +58,12 @@ def collect_member() -> LibraryMember:
 
 
 def show_register_menu(member_service: MemberService) -> None:
-    def render_intro(container: Container) -> None:
-        container.line()
-        container.line("Register a member")
-        container.line("Enter the member details below.")
-        container.line()
-        container.divider()
-        container.line(
-            "[Enter]  Register member", f"{CYAN}[Enter]{RESET}  Register member"
-        )
-        container.line("[B]      Back", f"{CYAN}[B]{RESET}      Back")
-
     while True:
-        Container().show(render_intro)
+        show_header("Register a member", "Enter the member details below.")
+        print("[Enter] Register member")
+        print("[B] Back")
 
-        choice = input(f"\n  {GREEN}❯{RESET} Select an option: ").strip().lower()
+        choice = input(f"\n{GREEN}>{RESET} Select an option: ").strip().lower()
 
         if choice == "b":
             return

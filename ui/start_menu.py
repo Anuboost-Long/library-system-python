@@ -1,16 +1,15 @@
 """Main navigation screen for the library management system."""
 
-from ui.components import Container
-from constants.theme import BOLD, CYAN, GRAY, GREEN, RED, RESET
+from constants.theme import CYAN, GREEN, RED, RESET
+from ui.prompts import show_header
 
 
 def show_start_menu() -> int:
     """Show available actions and return the selected menu number."""
     while True:
-        print()
-        print(f"  {GREEN}◆{RESET} {BOLD}Library Management System{RESET}")
-        print(f"  {GRAY}A workspace for managing library resources.{RESET}")
-        print()
+        show_header(
+            "Library Management System", "Manage your members, items, and loans."
+        )
 
         options = [
             ("1", "Borrow Item"),
@@ -21,25 +20,15 @@ def show_start_menu() -> int:
             ("6", "Loan List"),
         ]
 
-        def render_menu(container: Container) -> None:
-            container.line()
-            container.line("WHAT WOULD YOU LIKE TO DO?")
-            container.line()
+        for number, label in options:
+            print(f"{CYAN}{number}.{RESET} {label}")
 
-            for number, label in options:
-                text = f"[{number}]  {label}"
-                styled = f"{CYAN}[{number}]{RESET}  {label}"
-                container.line(text, styled)
+        print("-" * 44)
+        print("0. Quit")
 
-            container.line()
-            container.divider()
-            container.line("[0]  Quit", f"{GRAY}[0]{RESET}  Quit")
-
-        Container().show(render_menu)
-
-        choice = input(f"\n  {GREEN}❯{RESET} Select an option: ").strip()
+        choice = input(f"\n{GREEN}>{RESET} Select an option: ").strip()
 
         if choice in ("0", "1", "2", "3", "4", "5", "6"):
             return int(choice)
 
-        print(f"\n  {RED}✕ Invalid option. Please try again.{RESET}")
+        print(f"\n{RED}Error: Invalid option. Please try again.{RESET}")

@@ -1,11 +1,10 @@
-from constants.theme import CYAN, DEFAULT_WIDTH, GREEN, RED, RESET
+from constants.theme import GREEN, RESET
 from models.library_member import LibraryMember
 from models.loan import Loan
 from services.loan.loan_service import LoanService
 from services.member.member_service import MemberService
 from ui.borrow_menu import select_member
-from ui.components import Container
-from ui.prompts import show_error, show_success
+from ui.prompts import show_error, show_header, show_success
 
 
 LOANS_PER_PAGE = 10
@@ -15,29 +14,14 @@ def show_loan_list_menu(
     loan_service: LoanService, member_service: MemberService
 ) -> None:
     while True:
-        def render_menu(container: Container) -> None:
-            container.line()
-            container.line("Loan list")
-            container.line()
-            container.line("[1]  All loans", f"{CYAN}[1]{RESET}  All loans")
-            container.line(
-                "[2]  Loans for a member",
-                f"{CYAN}[2]{RESET}  Loans for a member",
-            )
-            container.line(
-                "[3]  Return loans",
-                f"{CYAN}[3]{RESET}  Return loans",
-            )
-            container.line(
-                "[4]  Overdue items",
-                f"{CYAN}[4]{RESET}  Overdue items",
-            )
-            container.line()
-            container.divider()
-            container.line("[B]  Back", f"{CYAN}[B]{RESET}  Back")
-
-        Container().show(render_menu)
-        choice = input(f"\n  {GREEN}❯{RESET} Select an option: ").strip().lower()
+        show_header("Loan list")
+        print("1. All loans")
+        print("2. Loans for a member")
+        print("3. Return loans")
+        print("4. Overdue items")
+        print("-" * 44)
+        print("B. Back")
+        choice = input(f"\n{GREEN}>{RESET} Select an option: ").strip().lower()
 
         if choice == "b":
             return
@@ -124,37 +108,23 @@ def show_return_loans(loan_service: LoanService) -> None:
             controls.append("[C]  Confirm returns")
 
         controls.append("[B]  Back")
-        loan_groups = [loan_details(loan) for loan in page_loans]
         heading = f"Return loans · {len(selected_loan_ids)} selected · Page {page} of {page_count}"
-        content = [heading, *controls, *selected_loan_ids]
-        content.extend(line for group in loan_groups for line in group)
-        width = max(DEFAULT_WIDTH, max(len(line) + 4 for line in content))
+        show_header(heading)
 
-        def render_loans(container: Container) -> None:
-            container.line()
-            container.line(heading)
-            container.line()
+        for index, loan in enumerate(page_loans):
+            if index:
+                print("-" * 44)
 
-            for index, (loan, lines) in enumerate(zip(page_loans, loan_groups)):
-                container.divider()
+            print(loan.describe())
 
-                for line in lines:
-                    container.line(line, styled_loan_line(line, loan))
+        if selected_loan_ids:
+            print(f"\nSelected: {', '.join(selected_loan_ids)}")
 
-                if index == len(loan_groups) - 1:
-                    container.divider()
-
-            if selected_loan_ids:
-                container.line()
-                container.line(f"Selected: {', '.join(selected_loan_ids)}")
-
-            container.line()
-            for control in controls:
-                container.line(control)
-
-        Container(width=width).show(render_loans)
+        print("-" * 44)
+        for control in controls:
+            print(control)
         choice = input(
-            f"\n  {GREEN}❯{RESET} Enter a loan ID or select an option: "
+            f"\n{GREEN}>{RESET} Enter a loan ID or select an option: "
         ).strip()
         command = choice.lower()
 
@@ -222,17 +192,17 @@ def active_loans(
 def choose_search() -> tuple[str | None, str | None]:
     while True:
         choice = input(
-            f"\n  {GREEN}❯{RESET} Search by [M]ember ID, [I]tem ID, or [B]ack: "
+            f"\n{GREEN}>{RESET} Search by [M]ember ID, [I]tem ID, or [B]ack: "
         ).strip().lower()
 
         if choice == "b":
             return None, None
 
         if choice == "m":
-            return "member", input(f"  {GREEN}❯{RESET} Member ID: ").strip()
+            return "member", input(f"{GREEN}>{RESET} Member ID: ").strip()
 
         if choice == "i":
-            return "item", input(f"  {GREEN}❯{RESET} Item ID: ").strip()
+            return "item", input(f"{GREEN}>{RESET} Item ID: ").strip()
 
         show_error("Choose M for member ID or I for item ID.")
 
@@ -256,31 +226,18 @@ def show_loans(title: str, loans: list[Loan]) -> None:
             controls.append("[N]  Next")
 
         controls.append("[Enter]  Back")
-        loan_groups = [loan_details(loan) for loan in page_loans]
-        content = [f"{title} · Page {page} of {page_count}", *controls]
-        content.extend(line for group in loan_groups for line in group)
-        width = max(DEFAULT_WIDTH, max(len(line) + 4 for line in content))
+        show_header(f"{title} · Page {page} of {page_count}")
 
-        def render_loans(container: Container) -> None:
-            container.line()
-            container.line(f"{title} · Page {page} of {page_count}")
-            container.line()
+        for index, loan in enumerate(page_loans):
+            if index:
+                print("-" * 44)
 
-            for index, (loan, lines) in enumerate(zip(page_loans, loan_groups)):
-                container.divider()
+            print(loan.describe())
 
-                for line in lines:
-                    container.line(line, styled_loan_line(line, loan))
-
-                if index == len(loan_groups) - 1:
-                    container.divider()
-
-            container.line()
-            for control in controls:
-                container.line(control)
-
-        Container(width=width).show(render_loans)
-        choice = input(f"\n  {GREEN}❯{RESET} Select an option: ").strip().lower()
+        print("-" * 44)
+        for control in controls:
+            print(control)
+        choice = input(f"\n{GREEN}>{RESET} Select an option: ").strip().lower()
 
         if not choice or choice == "b":
             return
@@ -297,44 +254,8 @@ def show_loans(title: str, loans: list[Loan]) -> None:
 
 
 def show_empty_loans(title: str, message: str, help_text: str) -> None:
-    content = [title, message, help_text, "[Enter]  Back"]
-    width = max(DEFAULT_WIDTH, max(len(line) + 4 for line in content))
-
-    def render_empty_loans(container: Container) -> None:
-        container.line()
-        container.line(title)
-        container.line()
-        container.line(message)
-        container.line(help_text)
-        container.line()
-        container.line("[Enter]  Back")
-
-    Container(width=width).show(render_empty_loans)
-    input(f"\n  {GREEN}❯{RESET} Press Enter to go back: ")
-
-
-def loan_details(loan: Loan) -> list[str]:
-    status = "● Not returned"
-
-    if loan.return_date is not None:
-        status = f"● Returned · {loan.return_date:%d/%m/%Y %H:%M}"
-
-    return [
-        f"Loan ID: {loan.loan_id}",
-        f"Member ID: {loan.member_id}",
-        f"Item ID: {loan.item_id}",
-        f"Borrowed: {loan.borrow_date:%d/%m/%Y %H:%M}",
-        f"Due: {loan.due_date:%d/%m/%Y %H:%M}",
-        f"Returned: {status}",
-    ]
-
-
-def styled_loan_line(line: str, loan: Loan) -> str:
-    if line.startswith("Due:") and loan.is_overdue():
-        return f"{RED}{line}{RESET}"
-
-    if not line.startswith("Returned:"):
-        return line
-
-    colour = GREEN if loan.return_date is not None else RED
-    return f"Returned: {colour}{line.removeprefix('Returned: ')}{RESET}"
+    show_header(title)
+    print(message)
+    print(help_text)
+    print("\n[Enter] Back")
+    input(f"\n{GREEN}>{RESET} Press Enter to go back: ")

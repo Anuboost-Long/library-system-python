@@ -59,6 +59,10 @@ class LibraryMember(Person):
             raise ValueError("Invalid date")
         self.__registered_at = datetime.strptime(value, "%d/%m/%Y").date()
 
-    def describe(self):
-        """Return a short summary suitable for a compact member listing."""
-        return f"Member ID: {self.member_id}, Name: {self.name}"
+    def describe(self) -> str:
+        return (
+            f"Member ID: {self.member_id}\n"
+            f"Membership type: {self.membership_type}\n"
+            f"Registered: {self.registered_at:%d/%m/%Y}\n"
+            f"{super().describe()}"
+        )

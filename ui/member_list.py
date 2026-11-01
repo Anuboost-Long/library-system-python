@@ -1,24 +1,10 @@
-from constants.theme import DEFAULT_WIDTH, GREEN, RESET
+from constants.theme import GREEN, RESET
 from models.library_member import LibraryMember
 from services.member.member_service import MemberService
-from ui.components import Container
-from ui.prompts import show_error
+from ui.prompts import show_error, show_header
 
 
 MEMBERS_PER_PAGE = 10
-
-
-def member_details(member: LibraryMember) -> list[str]:
-    """Format all details for one member as readable terminal rows."""
-    return [
-        f"Member ID: {member.member_id}",
-        f"Name: {member.name}",
-        f"Membership type: {member.membership_type}",
-        f"Date of birth: {member.dob:%d/%m/%Y}",
-        f"Email: {member.email}",
-        f"Phone: {member.phone}",
-        f"Registered: {member.registered_at:%d/%m/%Y}",
-    ]
 
 
 def show_member_list(member_service: MemberService) -> None:
@@ -34,20 +20,11 @@ def show_member_list(member_service: MemberService) -> None:
         all_members = member_service.get_all_members()
 
         if not all_members:
-            content = ["Member list", "[Enter]  Back", *empty_state]
-            width = max(DEFAULT_WIDTH, max(len(line) + 4 for line in content))
-
-            def render_empty_state(container: Container) -> None:
-                container.line()
-                container.line("Member list")
-                container.line()
-                for line in empty_state:
-                    container.line(line)
-                container.line()
-                container.line("[Enter]  Back")
-
-            Container(width=width).show(render_empty_state)
-            input(f"\n  {GREEN}❯{RESET} Press Enter to go back: ")
+            show_header("Member list")
+            for line in empty_state:
+                print(line)
+            print("\n[Enter] Back")
+            input(f"\n{GREEN}>{RESET} Press Enter to go back: ")
             return
 
         members = [
@@ -63,7 +40,6 @@ def show_member_list(member_service: MemberService) -> None:
             continue
 
         page_members = members[offset : offset + MEMBERS_PER_PAGE]
-        member_groups = [member_details(member) for member in page_members]
         page = offset // MEMBERS_PER_PAGE + 1
         page_count = (len(members) - 1) // MEMBERS_PER_PAGE + 1
         has_previous = offset > 0
@@ -84,33 +60,21 @@ def show_member_list(member_service: MemberService) -> None:
         if query:
             heading = f'{heading} · Search: "{query}"'
 
-        content = [heading, *controls]
-        content.extend(line for group in member_groups for line in group)
-        width = max(DEFAULT_WIDTH, max(len(line) + 4 for line in content))
+        show_header(heading)
 
-        def render_members(container: Container) -> None:
-            container.line()
-            container.line(heading)
-            container.line()
+        for index, member in enumerate(page_members):
+            if index:
+                print("-" * 44)
 
-            for index, lines in enumerate(member_groups):
-                container.divider()
+            print(member.describe())
 
-                for line in lines:
-                    container.line(line)
-
-                if index == len(member_groups) - 1:
-                    container.divider()
-
-            container.line()
-            for control in controls:
-                container.line(control)
-
-        Container(width=width).show(render_members)
-        choice = input(f"\n  {GREEN}❯{RESET} Select an option: ").strip().lower()
+        print("-" * 44)
+        for control in controls:
+            print(control)
+        choice = input(f"\n{GREEN}>{RESET} Select an option: ").strip().lower()
 
         if choice == "s":
-            query = input(f"  {GREEN}❯{RESET} Member name: ").strip()
+            query = input(f"{GREEN}>{RESET} Member name: ").strip()
             offset = 0
             continue
 
