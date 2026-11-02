@@ -85,7 +85,7 @@ class Loan:
         returned = "Not returned"
 
         if self.return_date is not None:
-            returned = self.return_date.strftime("Returned %d/%m/%Y %H:%M")
+            returned = self.return_date.strftime("%d/%m/%Y %H:%M")
 
         return (
             f"Loan ID: {self.loan_id}\n"
