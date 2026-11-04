@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from models.library_item import LibraryItem
 from models.library_member import LibraryMember
 from models.loan import Loan
-from models.membership_type import MembershipType
 from services.library.library_service import LibraryService
 from services.member.member_service import MemberService
 
@@ -63,8 +62,7 @@ class LoanService:
                 member_id=library_member.member_id,
                 item_id=library_item.item_id,
                 borrow_date=borrow_date,
-                due_date=borrow_date
-                + timedelta(days=self.loan_period(library_member)),
+                due_date=borrow_date + timedelta(days=library_member.loan_period()),
             )
             self.__loans[loan.loan_id] = loan
             library_item.is_available = False
@@ -106,7 +104,7 @@ class LoanService:
             loan.member_id == library_member.member_id and loan.return_date is None
             for loan in self.__loans.values()
         )
-        return self.borrowing_limit(library_member) - active_loans
+        return library_member.borrowing_limit() - active_loans
 
     def return_loan(self, loan: Loan | str) -> Loan:
         return self.return_loans([loan])[0]
@@ -166,17 +164,3 @@ class LoanService:
                 return library_item
 
         raise ValueError("Item not found")
-
-    @staticmethod
-    def loan_period(member: LibraryMember) -> int:
-        if member.membership_type is MembershipType.PREMIUM:
-            return 14
-
-        return 7
-
-    @staticmethod
-    def borrowing_limit(member: LibraryMember) -> int:
-        if member.membership_type is MembershipType.PREMIUM:
-            return 7
-
-        return 5

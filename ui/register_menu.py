@@ -1,8 +1,7 @@
 from datetime import date
 
 from constants.theme import GREEN, RESET
-from models.library_member import LibraryMember
-from models.membership_type import MembershipType
+from models.library_member import LibraryMember, NormalMember, PremiumMember
 from services.member.member_service import MemberService
 from ui.prompts import ask, show_error, show_header, show_success
 from utils.check_date_valid import check_date_validity
@@ -18,18 +17,18 @@ def ask_date_of_birth() -> str:
         show_error("Enter a valid date of birth in DD/MM/YYYY.")
 
 
-def ask_membership_type() -> MembershipType:
+def ask_member_type() -> type[LibraryMember]:
     choices = {
-        "1": MembershipType.NORMAL,
-        "2": MembershipType.PREMIUM,
+        "1": NormalMember,
+        "2": PremiumMember,
     }
 
     while True:
         choice = ask("Membership type", "1. Normal  2. Premium")
-        membership_type = choices.get(choice)
+        member_type = choices.get(choice)
 
-        if membership_type is not None:
-            return membership_type
+        if member_type is not None:
+            return member_type
 
         show_error("Choose 1 for Normal or 2 for Premium.")
 
@@ -41,16 +40,15 @@ def collect_member() -> LibraryMember:
         email = ask("Email Address")
         phone = ask("Phone Number")
         member_id = ask("Member ID", "Example: Tor001")
-        membership_type = ask_membership_type()
+        member_type = ask_member_type()
 
         try:
-            return LibraryMember(
+            return member_type(
                 name=name,
                 dob=dob,
                 email=email,
                 phone=phone,
                 member_id=member_id,
-                membership_type=membership_type,
                 registered_at=date.today().strftime("%d/%m/%Y"),
             )
         except ValueError as error:

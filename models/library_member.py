@@ -1,9 +1,9 @@
 """Library member model built on the shared person details."""
 
-from models.person import Person
-from models.membership_type import MembershipType
-from utils.check_date_valid import check_date_validity
 from datetime import date, datetime
+
+from models.person import Person
+from utils.check_date_valid import check_date_validity
 
 
 class LibraryMember(Person):
@@ -16,13 +16,11 @@ class LibraryMember(Person):
         email: str,
         phone: str,
         member_id: str,
-        membership_type: MembershipType,
         registered_at: str,
     ):
         """Create a member with a unique member ID and registration date."""
         super().__init__(name=name, dob=dob, phone=phone, email=email)
         self.member_id = member_id
-        self.membership_type = membership_type
         self.registered_at = registered_at
 
     @property
@@ -40,16 +38,6 @@ class LibraryMember(Person):
         self.__member_id = value.strip()
 
     @property
-    def membership_type(self):
-        return self.__membership_type
-
-    @membership_type.setter
-    def membership_type(self, value: MembershipType):
-        if not isinstance(value, MembershipType):
-            raise ValueError("Invalid membership type")
-        self.__membership_type = value
-
-    @property
     def registered_at(self):
         return self.__registered_at
 
@@ -62,7 +50,41 @@ class LibraryMember(Person):
     def describe(self) -> str:
         return (
             f"Member ID: {self.member_id}\n"
-            f"Membership type: {self.membership_type}\n"
+            f"Membership type: {self.membership_name}\n"
             f"Registered: {self.registered_at:%d/%m/%Y}\n"
             f"{super().describe()}"
         )
+
+    @property
+    def membership_name(self) -> str:
+        raise NotImplementedError
+
+    def loan_period(self) -> int:
+        raise NotImplementedError
+
+    def borrowing_limit(self) -> int:
+        raise NotImplementedError
+
+
+class NormalMember(LibraryMember):
+    @property
+    def membership_name(self) -> str:
+        return "Normal"
+
+    def loan_period(self) -> int:
+        return 7
+
+    def borrowing_limit(self) -> int:
+        return 5
+
+
+class PremiumMember(LibraryMember):
+    @property
+    def membership_name(self) -> str:
+        return "Premium"
+
+    def loan_period(self) -> int:
+        return 14
+
+    def borrowing_limit(self) -> int:
+        return 7
